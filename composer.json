@@ -1,14 +1,17 @@
 {
     "name": "carbontwelve/tapestry-api",
     "description": "Backend API implementation for carbontwelve/tapestry",
-    "require": {
-        "carbontwelve/tapestry": "^1.0"
-    },
     "license": "MIT",
     "authors": [
         {
             "name": "Simon Dann",
             "email": "simon.dann@gmail.com"
         }
-    ]
+    ],
+    "require": {
+        "carbontwelve/tapestry": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.1.*"
+    }
 }
