@@ -5,6 +5,9 @@ namespace App\Providers;
 use Interop\Container\ContainerInterface;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Symfony\Component\Console\Input\ArrayInput;
+use Tapestry\Entities\Project;
+use Tapestry\Generator;
 use Tapestry\Providers\CommandServiceProvider;
 use Tapestry\Providers\ContentServiceProvider;
 use Tapestry\Providers\FilesystemServiceProvider;
@@ -25,24 +28,11 @@ class TapestryCoreProvider implements ServiceProviderInterface
      */
     public function register(Container $pimple)
     {
-
-        $tapestry = new Tapestry();
-
-
-
-
-        $tapestry = new Tapestry([
-            'environment' => 'local',
-            'cwd' => APP_BASE . '/test-site/'
-        ]);
-
-        $tapestry['paths.dist'] = APP_BASE . '/storage/dist-local';
-
-        $tapestry->register(ContentServiceProvider::class);
-        $tapestry->register(FilesystemServiceProvider::class);
-        $tapestry->register(CommandServiceProvider::class);
-        $tapestry->register(KernelServiceProvider::class);
-
+        $tapestry = new Tapestry(new ArrayInput([
+            '--env' => 'local',
+            '--site-dir' => APP_BASE . '/test-site/',
+            '--dist-dir' => APP_BASE . '/storage/dist-local'
+        ]));
         $pimple[Tapestry::class] = $tapestry;
     }
 }

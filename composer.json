@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.5.9",
-        "carbontwelve/tapestry": "dev-master",
+        "carbontwelve/tapestry": "dev-development-1.6.0",
         "slim/slim": "^3.7",
         "monolog/monolog": "^1.22",
         "aura/session": "^2.1"
