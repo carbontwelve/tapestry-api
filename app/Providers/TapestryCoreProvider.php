@@ -6,6 +6,7 @@ use Interop\Container\ContainerInterface;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\Console\Input\ArrayInput;
+use Tapestry\Console\DefaultInputDefinition;
 use Tapestry\Entities\Project;
 use Tapestry\Generator;
 use Tapestry\Providers\CommandServiceProvider;
@@ -30,9 +31,9 @@ class TapestryCoreProvider implements ServiceProviderInterface
     {
         $tapestry = new Tapestry(new ArrayInput([
             '--env' => 'local',
-            '--site-dir' => APP_BASE . '/test-site/',
+            '--site-dir' => APP_BASE . '/test-site',
             '--dist-dir' => APP_BASE . '/storage/dist-local'
-        ]));
+        ], new DefaultInputDefinition()));
         $pimple[Tapestry::class] = $tapestry;
     }
 }

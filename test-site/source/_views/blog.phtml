@@ -1,0 +1,24 @@
+---
+generator:
+- CollectionItemGenerator
+---
+<?php
+
+/**
+ * @var \Tapestry\Entities\Pagination $previous_next
+ * @var string $title
+ * @var \Tapestry\Entities\ViewFileTrait|\Tapestry\Plates\Template $this
+ */
+
+$this->layout('_templates\default', ['title' => $title]);
+?>
+
+<article>
+    <header>
+        <h1 class="h1 regular m0"><?= $title ?></h1>
+        <div class="h6 mono pt1 red border-top">
+            <?= $this->getDate()->format('l jS \of F Y') ?>
+        </div>
+    </header>
+    <div><?= $this->getContent() ?></div>
+</article>
