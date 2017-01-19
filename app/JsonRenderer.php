@@ -59,6 +59,12 @@ class JsonRenderer
             'version' => '1.0'
         ];
 
+        $json->profile = [
+            'executionTime' => round((microtime(true) - APP_START), 3) . 's',
+            'memoryUsage' => file_size_convert(memory_get_usage(true)),
+            'peakMemoryUsage' => file_size_convert(memory_get_peak_usage(true))
+        ];
+
         if (count($this->links) > 0) {
             $json->links = $this->links;
         }

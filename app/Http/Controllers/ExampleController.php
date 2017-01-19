@@ -47,7 +47,8 @@ class ExampleController extends BaseController
                 'name' => $contentType->getName(),
                 'path' => $contentType->getPath(),
                 'template' => $contentType->getTemplate(),
-                'taxonomies' => []
+                'taxonomies' => array_keys($contentType->getTaxonomies()),
+                'fileCount' => count($contentType->getFileList())
             ];
             array_push($output, $tmp);
         }

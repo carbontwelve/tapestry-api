@@ -1,0 +1,5 @@
+---
+title: Yo
+---
+
+Hello world!

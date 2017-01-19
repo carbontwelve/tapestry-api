@@ -4,6 +4,10 @@ require __DIR__.'/../vendor/autoload.php';
 
 define('APP_BASE', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'));
 
+if (! defined('APP_START')) {
+    define('APP_START', microtime(true));
+}
+
 session_start();
 
 // Instantiate the container and inject settings
