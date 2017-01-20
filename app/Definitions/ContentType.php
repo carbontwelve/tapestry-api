@@ -4,6 +4,9 @@ namespace App\Definitions;
 
 use Slim\Container;
 use \Tapestry\Entities\ContentType as TapestryContentType;
+use Tapestry\Entities\Generators\FileGenerator;
+use Tapestry\Entities\Project;
+use Tapestry\Entities\ProjectFileInterface;
 
 //
 // Has Many Taxonomy
@@ -38,7 +41,12 @@ class ContentType extends JsonDefinition
         $this->setAttribute('path', $contentType->getPath());
         $this->setAttribute('template', $contentType->getTemplate());
         $this->setAttribute('taxonomies', array_keys($contentType->getTaxonomies()));
+        $this->setAttribute('files', array_keys($contentType->getFileList()));
         $this->setAttribute('fileCount', count($contentType->getFileList()));
+
+        $this->setLink('self', $this->container->get('router')->pathFor('content-type.view', [
+            'contentType' => $contentType->getName()
+        ]));
 
         foreach($contentType->getTaxonomies() as $taxonomy) {
             $tmpTaxonomy = new Taxonomy($taxonomy, $this->container);
@@ -47,6 +55,21 @@ class ContentType extends JsonDefinition
                 'taxonomy' => $taxonomy->getName()
             ]));
             $this->setRelationship($tmpTaxonomy);
+        }
+
+        $this->relationships['files'] = [];
+
+        foreach(array_keys($contentType->getFileList()) as $file) {
+            /** @var Project $project */
+            $project = $this->container->get(Project::class);
+
+            if (! $file = $project['files.' . $file]){
+                continue;
+            }
+            /** @var ProjectFileInterface $file */
+
+            $tmpFile = new File($file, $this->container);
+            $this->setRelationship($tmpFile);
         }
     }
 

@@ -43,6 +43,7 @@ class BaseController
         $this->project = $this->tapestry->getContainer()->get(Project::class);
         $generator = new Generator($this->steps, $this->tapestry);
         $generator->generate($this->project, $output);
+        $this->container[Project::class] = $this->project;
     }
 
     /**
