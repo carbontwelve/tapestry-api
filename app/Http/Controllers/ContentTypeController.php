@@ -66,6 +66,31 @@ class ContentTypeController extends BaseController
         return $jsonResponse->render($response);
     }
 
+    public function taxonomies(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    {
+        $this->bootProject(new NullOutput());
+
+        /** @var \Tapestry\Entities\ContentType|null $model */
+        if (! $model = $this->project['content_types.' . $args['contentType']]) {
+            return $response->withStatus(404);
+        }
+
+        $contentType = new ContentType($model, $this->container);
+        $contentType = $contentType->withTaxonomiesRelationship();
+
+        $data = [];
+
+        foreach ($contentType->getRelationships() as $relationship){
+            array_push($data, $relationship->toJsonResponse());
+        }
+
+        $jsonResponse = new JsonRenderer($data);
+        $jsonResponse->setLinks([
+            'self' => (string)$request->getUri()->getPath(),
+        ]);
+        return $jsonResponse->render($response);
+    }
+
     public function taxonomy(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
         $this->bootProject(new NullOutput());
@@ -76,11 +101,16 @@ class ContentTypeController extends BaseController
         }
 
         $contentType = new ContentType($model, $this->container);
+        $contentType = $contentType->withTaxonomiesRelationship();
 
         /** @var Taxonomy|null $taxonomy */
         if (! $taxonomy = $contentType->getRelationship($args['taxonomy'])) {
             return $response->withStatus(404);
         }
+
+        // This needs to come before the apply, because the related link needs to exist for the classifications
+        // to have theirs successfully set.
+        $taxonomy = $taxonomy->withClassificationRelationship();
 
         $taxonomy = $taxonomy->apply(function(JsonDefinition $definition){
             $definition->unsetLink('related');
@@ -104,11 +134,14 @@ class ContentTypeController extends BaseController
         }
 
         $contentType = new ContentType($model, $this->container);
+        $contentType = $contentType->withTaxonomiesRelationship();
 
         /** @var Taxonomy|null $taxonomy */
         if (! $taxonomy = $contentType->getRelationship($args['taxonomy'])) {
             return $response->withStatus(404);
         }
+
+        $taxonomy = $taxonomy->withClassificationRelationship();
 
         /** @var Classification $classification */
         if (! $classification = $taxonomy->getRelationship($args['classification'])) {

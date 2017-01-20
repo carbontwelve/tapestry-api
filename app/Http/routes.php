@@ -11,6 +11,9 @@ $app->get('/content-types', 'App\Http\Controllers\ContentTypeController:index')
 $app->get('/content-types/{contentType}', 'App\Http\Controllers\ContentTypeController:view')
     ->setName('content-type.view');
 
+$app->get('/content-types/{contentType}/taxonomies', 'App\Http\Controllers\ContentTypeController:taxonomies')
+    ->setName('content-type.taxonomies');
+
 $app->get('/content-types/{contentType}/taxonomy/{taxonomy}', 'App\Http\Controllers\ContentTypeController:taxonomy')
     ->setName('content-type.taxonomy');
 

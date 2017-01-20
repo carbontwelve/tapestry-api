@@ -12,7 +12,7 @@ class Taxonomy extends JsonDefinition
      */
     private $container;
 
-    private $taxonomy;
+    private $taxonomyFileList;
 
     /**
      * ContentType constructor.
@@ -22,21 +22,22 @@ class Taxonomy extends JsonDefinition
     public function __construct(TapestryTaxonomy $taxonomy, Container $container)
     {
         $this->container = $container;
-        $this->taxonomy = $taxonomy;
+        $this->taxonomyFileList = $taxonomy->getFileList();
         $this->hydrate($taxonomy);
     }
 
     public function hydrate (TapestryTaxonomy $taxonomy) {
         $this->id = $taxonomy->getName();
         $this->type = 'taxonomy';
-        $this->setAttribute('classificationCount', count($taxonomy->getFileList()));
+        $this->setAttribute('classificationCount', count($this->taxonomyFileList));
+        $this->setAttribute('classifications', array_keys($this->taxonomyFileList));
     }
 
     public function withClassificationRelationship($closure = null)
     {
         $clone = clone($this);
 
-        foreach ($this->taxonomy->getFileList() as $id => $fileList) {
+        foreach ($this->taxonomyFileList as $id => $fileList) {
             $classification = new Classification($id, $fileList, $this->container);
             if (isset($this->links['related'])) {
                 $classification->setLink('related', $this->links['related'] . '/' . $id);
