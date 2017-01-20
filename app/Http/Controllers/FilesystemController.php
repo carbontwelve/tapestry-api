@@ -2,20 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Definitions\File;
+use App\Definitions\JsonDefinition;
 use App\JsonRenderer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Console\Output\NullOutput;
 
 class FilesystemController extends BaseController
 {
-    public function index(ServerRequestInterface $request, ResponseInterface $response, array $args)
-    {
-        /** @var \League\Flysystem\MountManager $filesystem */
-        $filesystem = $this->tapestry[\League\Flysystem\MountManager::class];
+    public function file(ServerRequestInterface $request, ResponseInterface $response, array $args){
+        $this->bootProject(new NullOutput());
 
-        $jsonResponse = new JsonRenderer($filesystem->listContents('cwd://', true));
+        /** @var \Tapestry\Entities\File $file */
+        if (! $file = $this->project['files.' . $args['id']]) {
+            return $response->withStatus(404);
+        }
+
+        $file = new File($file, $this->container);
+        $file->withDetails();
+
+        $file = $file->apply(function(JsonDefinition $definition){
+            $definition->unsetLink('self');
+            return $definition;
+        });
+
+        $jsonResponse = new JsonRenderer([$file->toJsonResponse()]);
         $jsonResponse->setLinks([
-            'self' => (string)$request->getUri()
+            'self' => (string)$request->getUri()->getPath(),
         ]);
         return $jsonResponse->render($response);
     }

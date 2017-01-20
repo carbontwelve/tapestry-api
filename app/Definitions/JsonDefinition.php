@@ -20,6 +20,11 @@ class JsonDefinition
 
     protected $links = [];
 
+    public function isRelative()
+    {
+        return $this->isRelative();
+    }
+
     public function setAttribute($key, $value)
     {
         $this->attributes[$key] = $value;

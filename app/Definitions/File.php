@@ -31,7 +31,8 @@ class File extends JsonDefinition
     /**
      * @param ProjectFileInterface|\Tapestry\Entities\File $file
      */
-    public function hydrate (ProjectFileInterface $file) {
+    public function hydrate(ProjectFileInterface $file)
+    {
         $this->id = $file->getUid();
         $this->type = 'file';
         $this->file = $file;
@@ -39,5 +40,20 @@ class File extends JsonDefinition
         $this->setLink('self', $this->container->get('router')->pathFor('filesystem.file', [
             'id' => $this->getId()
         ]));
+    }
+
+    public function setLink($name, $url)
+    {
+        // Files do not have related links
+        if ($name === 'related') {
+            return;
+        }
+        parent::setLink($name, $url);
+    }
+
+    public function withDetails()
+    {
+        $this->setAttribute('fileContent', $this->file->getFileContent());
+        $this->setAttribute('frontMatter', $this->file->getData());
     }
 }

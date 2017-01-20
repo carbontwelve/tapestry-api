@@ -3,6 +3,8 @@
 namespace App\Definitions;
 
 use Slim\Container;
+use Tapestry\Entities\Project;
+use Tapestry\Entities\ProjectFileInterface;
 use Tapestry\Entities\Taxonomy as TapestryTaxonomy;
 
 //
@@ -32,6 +34,19 @@ class Classification extends JsonDefinition
         $this->id = $id;
         $this->type = 'classification';
         $this->setAttribute('fileCount', count($fileList));
-        $this->setAttribute('files', $fileList);
+        $this->setAttribute('files', array_keys($fileList));
+
+        foreach(array_keys($fileList) as $file) {
+            /** @var Project $project */
+            $project = $this->container->get(Project::class);
+
+            if (! $file = $project['files.' . $file]){
+                continue;
+            }
+            /** @var ProjectFileInterface $file */
+
+            $tmpFile = new File($file, $this->container);
+            $this->setRelationship($tmpFile);
+        }
     }
 }

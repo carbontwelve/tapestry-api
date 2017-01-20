@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Interop\Container\ContainerInterface;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tapestry\Entities\Project;
 use Tapestry\Generator;
