@@ -4,6 +4,7 @@ namespace App\Definitions;
 
 use Slim\Container;
 use Tapestry\Entities\ProjectFileInterface;
+use Tapestry\Modules\Content\FrontMatter;
 
 class File extends JsonDefinition
 {
@@ -53,7 +54,9 @@ class File extends JsonDefinition
 
     public function withDetails()
     {
-        $this->setAttribute('fileContent', $this->file->getFileContent());
-        $this->setAttribute('frontMatter', $this->file->getData());
+        // We only care about the frontmatter stored inside the file, not the frontmatter as mutated by Tapestry
+        $frontMatter = new FrontMatter($this->file->getFileContent());
+        $this->setAttribute('fileContent', $frontMatter->getContent());
+        $this->setAttribute('frontMatter', $frontMatter->getData());
     }
 }
