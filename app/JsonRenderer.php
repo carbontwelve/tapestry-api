@@ -33,7 +33,13 @@ class JsonRenderer
 
     public function __construct(array $data, array $errors = [])
     {
-        $this->data = $data;
+        foreach ($data as $key => $value) {
+            if ($key === 'data'){
+                array_push($this->data, $value);
+                continue;
+            }
+            $this->data[$key] = $value;
+        }
         $this->errors = $errors;
     }
 

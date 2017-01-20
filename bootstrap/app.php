@@ -1,5 +1,7 @@
 <?php
 
+use Slim\Router;
+
 require __DIR__.'/../vendor/autoload.php';
 
 define('APP_BASE', realpath(__DIR__.DIRECTORY_SEPARATOR.'..'));
