@@ -26,7 +26,7 @@ $app->get('/content-types/{contentType}/taxonomy/{taxonomy}/{classification}', '
 $app->get('/filesystem/file/{id}', 'App\Http\Controllers\FilesystemController:file')
     ->setName('filesystem.file');
 
-$app->get('/filesystem/directory/{id}', 'App\Http\Controllers\FilesystemController:directory')
+$app->get('/filesystem/directory[/{id}]', 'App\Http\Controllers\FilesystemController:directory')
     ->setName('filesystem.directory');
 
 $app->get('/fs', 'App\Http\Controllers\FilesystemController:index');

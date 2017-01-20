@@ -37,7 +37,12 @@ class FilesystemController extends BaseController
 
     public function directory(ServerRequestInterface $request, ResponseInterface $response, array $args){
         $this->bootProject(new NullOutput());
-        $path = base64_decode($args['id']);
+
+        $path = "";
+
+        if (isset($args['id'])) {
+            $path = base64_decode($args['id']);
+        }
 
         $realPath = realpath($this->project->sourceDirectory . DIRECTORY_SEPARATOR . $path);
 
@@ -46,7 +51,9 @@ class FilesystemController extends BaseController
         }
 
         $directory = new Directory($path, $this->container);
-        $directory = $directory->withFilesRelationship();
+        $directory = $directory
+            ->withFilesRelationship()
+            ->withDirectoriesRelationship();
 
         $jsonResponse = new JsonRenderer([$directory->toJsonResponse()]);
         $jsonResponse->setLinks([

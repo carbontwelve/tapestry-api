@@ -41,6 +41,33 @@ class Directory extends JsonDefinition
         ]));
     }
 
+    public function withDirectoriesRelationship($closure = null)
+    {
+
+        /** @var Project $project */
+        $project = $this->container->get(Project::class);
+        $directory = realpath($project->sourceDirectory . DIRECTORY_SEPARATOR . $this->attributes['path']);
+
+        $finder = new Finder();
+        $finder->directories()
+            ->followLinks()
+            ->in($directory)
+            ->ignoreDotFiles(true)
+            ->depth('==0');
+
+        $clone = clone($this);
+        $directories = [];
+
+        /** @var \Symfony\Component\Finder\SplFileInfo $directory */
+        foreach ($finder->directories() as $directory) {
+            // @todo $directoryPath should not start with a / or \
+            $directoryPath = $this->attributes['path'] . DIRECTORY_SEPARATOR . $directory->getRelativePathname();
+            array_push($directories, $directoryPath);
+        }
+
+        return $clone;
+    }
+
     public function withFilesRelationship($closure = null)
     {
         /** @var Project $project */
@@ -51,31 +78,31 @@ class Directory extends JsonDefinition
         $finder->files()
             ->followLinks()
             ->in($directory)
-            ->ignoreDotFiles(true);
+            ->ignoreDotFiles(true)
+            ->depth('==0');
 
         $clone = clone($this);
 
         $files = [];
         /** @var \Symfony\Component\Finder\SplFileInfo $file */
-        foreach ($finder->files() as $file){
-            array_push($files, $this->cleanUid($this->attributes['path'] .DIRECTORY_SEPARATOR . $file->getRelativePathname()));
+        foreach ($finder->files() as $file) {
+            array_push($files,
+                $this->cleanUid($this->attributes['path'] . DIRECTORY_SEPARATOR . $file->getRelativePathname()));
         }
-        $clone->setAttribute('files', $files);
 
         foreach ($files as $key => $value) {
-
             /** @var ProjectFileInterface $file */
-            if (! $file = $project['files.' . $this->cleanUid($this->attributes['path'] .DIRECTORY_SEPARATOR . $file->getRelativePathname())]) {
+            if (!$file = $project['files.' . $value]) {
                 unset($files[$key]);
                 continue;
             }
 
             $file = new File($file, $this->container);
             /** @var \App\Definitions\File $file */
-            $file = $file->apply(function(JsonDefinition $definition){
+            $file = $file->apply(function (JsonDefinition $definition) {
 
                 foreach ($definition->getRelationships() as $key => $relationship) {
-                    if ($relationship->type === $this->type){
+                    if ($relationship->type === $this->type) {
                         $definition->unsetRelationship($key);
                     }
                 }
@@ -84,16 +111,16 @@ class Directory extends JsonDefinition
 
             });
 
-            if (! is_null($closure) && $closure instanceof \Closure){
+            if (!is_null($closure) && $closure instanceof \Closure) {
                 $file = $closure($file);
-                if (! $file instanceof File){
+                if (!$file instanceof File) {
                     throw new \Exception('The closure passed to withFilesRelationship must return an instance of File.');
                 }
             }
-
             $clone->setRelationship($file);
         }
 
+        $clone->setAttribute('files', array_values($files));
         $clone->setAttribute('fileCount', count($clone->attributes['files']));
 
         return $clone;
@@ -103,6 +130,10 @@ class Directory extends JsonDefinition
     {
         $uid = str_replace('.', '_', $uid);
         $uid = str_replace(['/', '\\'], '_', $uid);
+
+        if (substr($uid, 0, 1) === '_') {
+            $uid = substr($uid, 1);
+        }
 
         return $uid;
     }
