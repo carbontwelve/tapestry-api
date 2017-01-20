@@ -3,6 +3,7 @@
 namespace App\Definitions;
 
 use Slim\Container;
+use Tapestry\Entities\Project;
 use Tapestry\Entities\ProjectFileInterface;
 use Tapestry\Modules\Content\FrontMatter;
 
@@ -38,9 +39,12 @@ class File extends JsonDefinition
         $this->type = 'file';
         $this->file = $file;
 
+        $this->setAttribute('path', $file->getPath());
         $this->setLink('self', $this->container->get('router')->pathFor('filesystem.file', [
             'id' => $this->getId()
         ]));
+
+        $this->setRelationship(new Directory($this->attributes['path'], $this->container));
     }
 
     public function setLink($name, $url)

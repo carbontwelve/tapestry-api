@@ -49,6 +49,11 @@ class JsonDefinition
         $this->updateRelationships();
     }
 
+    public function getRelationships()
+    {
+        return $this->relationships;
+    }
+
     public function getRelationship($id)
     {
         if (! isset($this->relationships[$id])) {
@@ -58,6 +63,12 @@ class JsonDefinition
         $tmp = $this->relationships[$id];
         $tmp->isRelative = false;
         return $tmp;
+    }
+
+    public function unsetRelationship($id)
+    {
+        unset($this->relationships[$id]);
+        $this->updateRelationships();
     }
 
     public function getId()
