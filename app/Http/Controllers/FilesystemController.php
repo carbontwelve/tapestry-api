@@ -9,23 +9,9 @@ use App\JsonRenderer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Console\Output\NullOutput;
-use Tapestry\Modules\Content\LoadSourceFiles;
-use Tapestry\Modules\ContentTypes\LoadContentTypes;
-use Tapestry\Modules\Generators\LoadContentGenerators;
-use Tapestry\Modules\Kernel\BootKernel;
-use Tapestry\Modules\Renderers\LoadContentRenderers;
 
 class FilesystemController extends BaseController
 {
-    /** @var array  */
-    protected $steps = [
-        BootKernel::class,
-        LoadContentTypes::class,
-        LoadContentRenderers::class,
-        LoadContentGenerators::class,
-        LoadSourceFiles::class,
-    ];
-
     public function file(ServerRequestInterface $request, ResponseInterface $response, array $args){
         $this->bootProject(new NullOutput());
 

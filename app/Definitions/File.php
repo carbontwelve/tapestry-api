@@ -39,6 +39,7 @@ class File extends JsonDefinition
         $this->type = 'file';
         $this->file = $file;
 
+        $this->setAttribute('ext', $file->getExt());
         $this->setAttribute('path', $file->getPath());
         $this->setAttribute('contentType', $file->getData('contentType', 'default'));
         $this->setLink('self', $this->container->get('router')->pathFor('filesystem.file', [

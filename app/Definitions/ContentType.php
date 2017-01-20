@@ -21,6 +21,8 @@ class ContentType extends JsonDefinition
      */
     private $container;
 
+    private $contentType;
+
     /**
      * ContentType constructor.
      * @param TapestryContentType $contentType
@@ -29,6 +31,7 @@ class ContentType extends JsonDefinition
     public function __construct(TapestryContentType $contentType, Container $container)
     {
         $this->container = $container;
+        $this->contentType = $contentType;
         $this->hydrate($contentType);
     }
 
@@ -47,19 +50,37 @@ class ContentType extends JsonDefinition
         $this->setLink('self', $this->container->get('router')->pathFor('content-type.view', [
             'contentType' => $contentType->getName()
         ]));
+    }
 
-        foreach($contentType->getTaxonomies() as $taxonomy) {
+    public function withTaxonomiesRelationship($closure = null)
+    {
+        $clone = clone($this);
+        foreach($this->contentType->getTaxonomies() as $taxonomy) {
             $tmpTaxonomy = new Taxonomy($taxonomy, $this->container);
             $tmpTaxonomy->setLink('related', $this->container->get('router')->pathFor('content-type.taxonomy', [
-                'contentType' => $contentType->getName(),
+                'contentType' => $this->contentType->getName(),
                 'taxonomy' => $taxonomy->getName()
             ]));
-            $this->setRelationship($tmpTaxonomy);
+
+            if (! is_null($closure) && $closure instanceof \Closure){
+                $tmpTaxonomy = $closure($tmpTaxonomy);
+                if (! $tmpTaxonomy instanceof Taxonomy){
+                    throw new \Exception('The closure passed to withTaxonomiesRelationship must return an instance of Taxonomy.');
+                }
+            }
+
+            $clone->setRelationship($tmpTaxonomy);
         }
+        return $clone;
+    }
 
-        $this->relationships['files'] = [];
+    public function withFilesRelationship($closure = null)
+    {
+        $clone = clone($this);
 
-        foreach(array_keys($contentType->getFileList()) as $file) {
+        $clone->relationships['files'] = [];
+
+        foreach(array_keys($this->contentType->getFileList()) as $file) {
             /** @var Project $project */
             $project = $this->container->get(Project::class);
 
@@ -69,8 +90,19 @@ class ContentType extends JsonDefinition
             /** @var ProjectFileInterface $file */
 
             $tmpFile = new File($file, $this->container);
-            $this->setRelationship($tmpFile);
+
+            if (! is_null($closure) && $closure instanceof \Closure){
+                $tmpFile = $closure($tmpFile);
+                if (! $tmpFile instanceof File){
+                    throw new \Exception('The closure passed to withFilesRelationship must return an instance of File.');
+                }
+            }
+
+
+            $clone->setRelationship($tmpFile);
         }
+
+        return $clone;
     }
 
 }

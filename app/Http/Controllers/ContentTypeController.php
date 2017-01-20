@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Definitions\Classification;
 use App\Definitions\ContentType;
 use App\Definitions\JsonDefinition;
 use App\Definitions\Taxonomy;
@@ -45,11 +46,18 @@ class ContentTypeController extends BaseController
             return $response->withStatus(404);
         }
 
+        /** @var ContentType $contentType */
         $contentType = new ContentType($model, $this->container);
         $contentType = $contentType->apply(function(JsonDefinition $definition){
             $definition->unsetLink('self');
             return $definition;
         });
+
+        $contentType = $contentType
+            ->withTaxonomiesRelationship(function(Taxonomy $taxonomy){
+                return $taxonomy->withClassificationRelationship();
+            })
+            ->withFilesRelationship();
 
         $jsonResponse = new JsonRenderer([$contentType->toJsonResponse()]);
         $jsonResponse->setLinks([
@@ -102,6 +110,7 @@ class ContentTypeController extends BaseController
             return $response->withStatus(404);
         }
 
+        /** @var Classification $classification */
         if (! $classification = $taxonomy->getRelationship($args['classification'])) {
             return $response->withStatus(404);
         }
@@ -110,6 +119,8 @@ class ContentTypeController extends BaseController
             $definition->unsetLink('related');
             return $definition;
         });
+
+        $classification = $classification->withFilesRelationship();
 
         $jsonResponse = new JsonRenderer([$classification->toJsonResponse()]);
         $jsonResponse->setLinks([

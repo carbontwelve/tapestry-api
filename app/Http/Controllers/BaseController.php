@@ -8,7 +8,6 @@ use Tapestry\Entities\Project;
 use Tapestry\Generator;
 use Tapestry\Modules\Content\LoadSourceFiles;
 use Tapestry\Modules\ContentTypes\LoadContentTypes;
-use Tapestry\Modules\ContentTypes\ParseContentTypes;
 use Tapestry\Modules\Generators\LoadContentGenerators;
 use Tapestry\Modules\Kernel\BootKernel;
 use Tapestry\Modules\Renderers\LoadContentRenderers;
@@ -29,7 +28,7 @@ class BaseController
         LoadContentRenderers::class,
         LoadContentGenerators::class,
         LoadSourceFiles::class,
-        ParseContentTypes::class,
+        //Tapestry\Modules\ContentTypes\ParseContentTypes:class,
     ];
 
     /**

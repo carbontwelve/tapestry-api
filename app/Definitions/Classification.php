@@ -35,8 +35,13 @@ class Classification extends JsonDefinition
         $this->type = 'classification';
         $this->setAttribute('fileCount', count($fileList));
         $this->setAttribute('files', array_keys($fileList));
+    }
 
-        foreach(array_keys($fileList) as $file) {
+    public function withFilesRelationship($closure = null)
+    {
+        $clone = clone($this);
+
+        foreach($this->attributes['files'] as $file) {
             /** @var Project $project */
             $project = $this->container->get(Project::class);
 
@@ -46,7 +51,17 @@ class Classification extends JsonDefinition
             /** @var ProjectFileInterface $file */
 
             $tmpFile = new File($file, $this->container);
-            $this->setRelationship($tmpFile);
+
+            if (! is_null($closure) && $closure instanceof \Closure){
+                $tmpFile = $closure($tmpFile);
+                if (! $tmpFile instanceof File){
+                    throw new \Exception('The closure passed to withFilesRelationship must return an instance of File.');
+                }
+            }
+
+            $clone->setRelationship($tmpFile);
         }
+
+        return $clone;
     }
 }

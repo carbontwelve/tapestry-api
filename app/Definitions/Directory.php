@@ -41,7 +41,7 @@ class Directory extends JsonDefinition
         ]));
     }
 
-    public function withFilesRelationship()
+    public function withFilesRelationship($closure = null)
     {
         /** @var Project $project */
         $project = $this->container->get(Project::class);
@@ -83,6 +83,13 @@ class Directory extends JsonDefinition
                 return $definition;
 
             });
+
+            if (! is_null($closure) && $closure instanceof \Closure){
+                $file = $closure($file);
+                if (! $file instanceof File){
+                    throw new \Exception('The closure passed to withFilesRelationship must return an instance of File.');
+                }
+            }
 
             $clone->setRelationship($file);
         }
