@@ -40,11 +40,21 @@ class File extends JsonDefinition
         $this->file = $file;
 
         $this->setAttribute('path', $file->getPath());
+        $this->setAttribute('contentType', $file->getData('contentType', 'default'));
         $this->setLink('self', $this->container->get('router')->pathFor('filesystem.file', [
             'id' => $this->getId()
         ]));
 
-        $this->setRelationship(new Directory($this->attributes['path'], $this->container));
+        $frontMatter = new FrontMatter($this->file->getFileContent());
+        $this->setAttribute('fileContent', $frontMatter->getContent());
+        $this->setAttribute('frontMatter', $frontMatter->getData());
+    }
+
+    public function withDirectoryRelationship()
+    {
+        $clone = clone($this);
+        $clone->setRelationship(new Directory($this->attributes['path'], $this->container));
+        return $clone;
     }
 
     public function setLink($name, $url)
@@ -54,13 +64,5 @@ class File extends JsonDefinition
             return;
         }
         parent::setLink($name, $url);
-    }
-
-    public function withDetails()
-    {
-        // We only care about the frontmatter stored inside the file, not the frontmatter as mutated by Tapestry
-        $frontMatter = new FrontMatter($this->file->getFileContent());
-        $this->setAttribute('fileContent', $frontMatter->getContent());
-        $this->setAttribute('frontMatter', $frontMatter->getData());
     }
 }

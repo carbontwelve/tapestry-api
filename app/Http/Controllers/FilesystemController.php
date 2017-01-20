@@ -29,13 +29,13 @@ class FilesystemController extends BaseController
     public function file(ServerRequestInterface $request, ResponseInterface $response, array $args){
         $this->bootProject(new NullOutput());
 
-        /** @var \Tapestry\Entities\File $file */
-        if (! $file = $this->project['files.' . $args['id']]) {
+        /** @var \Tapestry\Entities\File $tapestryFile */
+        if (! $tapestryFile = $this->project['files.' . $args['id']]) {
             return $response->withStatus(404);
         }
 
-        $file = new File($file, $this->container);
-        $file->withDetails();
+        $file = new File($tapestryFile, $this->container);
+        $file = $file->withDirectoryRelationship();
 
         $file = $file->apply(function(JsonDefinition $definition){
             $definition->unsetLink('self');
@@ -60,7 +60,7 @@ class FilesystemController extends BaseController
         }
 
         $directory = new Directory($path, $this->container);
-        $directory = $directory->withFiles();
+        $directory = $directory->withFilesRelationship();
 
         $jsonResponse = new JsonRenderer([$directory->toJsonResponse()]);
         $jsonResponse->setLinks([

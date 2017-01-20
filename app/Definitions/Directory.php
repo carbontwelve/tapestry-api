@@ -41,7 +41,7 @@ class Directory extends JsonDefinition
         ]));
     }
 
-    public function withFiles()
+    public function withFilesRelationship()
     {
         /** @var Project $project */
         $project = $this->container->get(Project::class);
