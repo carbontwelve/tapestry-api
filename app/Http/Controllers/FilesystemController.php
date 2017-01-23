@@ -36,30 +36,33 @@ class FilesystemController extends BaseController
     }
 
     public function directory(ServerRequestInterface $request, ResponseInterface $response, array $args){
-        $this->bootProject(new NullOutput());
 
-        $path = "";
+        return 'yo';
 
-        if (isset($args['id'])) {
-            $path = base64_decode($args['id']);
-        }
+        //$this->bootProject(new NullOutput());
 
-        $realPath = realpath($this->project->sourceDirectory . DIRECTORY_SEPARATOR . $path);
+        //$path = "";
 
-        if (!$realPath){
-            return $response->withStatus(404);
-        }
+        //if (isset($args['id'])) {
+        //    $path = base64_decode($args['id']);
+        //}
 
-        $directory = new Directory($path, $this->container);
-        $directory = $directory
-            ->withFilesRelationship()
-            ->withDirectoriesRelationship();
+        //$realPath = realpath($this->project->sourceDirectory . DIRECTORY_SEPARATOR . $path);
 
-        $jsonResponse = new JsonRenderer([$directory->toJsonResponse()]);
-        $jsonResponse->setLinks([
-            'self' => (string)$request->getUri()->getPath(),
-        ]);
-        return $jsonResponse->render($response);
+        //if (!$realPath){
+        //    return $response->withStatus(404);
+        //}
+
+        //$directory = new Directory($path, $this->container);
+        //$directory = $directory
+        //    ->withFilesRelationship()
+        //    ->withDirectoriesRelationship();
+
+        //$jsonResponse = new JsonRenderer([$directory->toJsonResponse()]);
+        //$jsonResponse->setLinks([
+        //    'self' => (string)$request->getUri()->getPath(),
+        //]);
+        //return $jsonResponse->render($response);
     }
 
     public function view(ServerRequestInterface $request, ResponseInterface $response, array $args)
