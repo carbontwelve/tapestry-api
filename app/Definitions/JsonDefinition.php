@@ -65,6 +65,13 @@ class JsonDefinition
         return $tmp;
     }
 
+    public function getLink($id) {
+        if (! isset($this->links[$id])) {
+            return null;
+        }
+        return $this->links[$id];
+    }
+
     public function unsetRelationship($id)
     {
         unset($this->relationships[$id]);

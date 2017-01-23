@@ -31,10 +31,12 @@ class Directory extends JsonDefinition
      */
     public function hydrate($path)
     {
+        $path = $this->cleanPath($path);
         $this->id = base64_encode($path);
         $this->type = 'directory';
 
         $this->setAttribute('path', $path);
+        $this->setAttribute('name', pathinfo($path, PATHINFO_BASENAME));
 
         $this->setLink('self', $this->container->get('router')->pathFor('filesystem.directory', [
             'id' => $this->getId()
@@ -43,7 +45,6 @@ class Directory extends JsonDefinition
 
     public function withDirectoriesRelationship($closure = null)
     {
-
         /** @var Project $project */
         $project = $this->container->get(Project::class);
         $directory = realpath($project->sourceDirectory . DIRECTORY_SEPARATOR . $this->attributes['path']);
@@ -60,10 +61,20 @@ class Directory extends JsonDefinition
 
         /** @var \Symfony\Component\Finder\SplFileInfo $directory */
         foreach ($finder->directories() as $directory) {
-            // @todo $directoryPath should not start with a / or \
             $directoryPath = $this->attributes['path'] . DIRECTORY_SEPARATOR . $directory->getRelativePathname();
-            array_push($directories, $directoryPath);
+            $directory = new Directory($directoryPath, $this->container);
+            if (!is_null($closure) && $closure instanceof \Closure) {
+                $directory = $closure($directory);
+                if (!$directory instanceof Directory) {
+                    throw new \Exception('The closure passed to withFilesRelationship must return an instance of Directory.');
+                }
+            }
+            $clone->setRelationship($directory);
+            array_push($directories, $directory->getId());
         }
+
+        $clone->setAttribute('directories', $directories);
+        $clone->setAttribute('dirCount', count($directories));
 
         return $clone;
     }
@@ -100,7 +111,6 @@ class Directory extends JsonDefinition
             $file = new File($file, $this->container);
             /** @var \App\Definitions\File $file */
             $file = $file->apply(function (JsonDefinition $definition) {
-
                 foreach ($definition->getRelationships() as $key => $relationship) {
                     if ($relationship->type === $this->type) {
                         $definition->unsetRelationship($key);
@@ -108,7 +118,6 @@ class Directory extends JsonDefinition
                 }
 
                 return $definition;
-
             });
 
             if (!is_null($closure) && $closure instanceof \Closure) {
@@ -134,8 +143,15 @@ class Directory extends JsonDefinition
         if (substr($uid, 0, 1) === '_') {
             $uid = substr($uid, 1);
         }
-
         return $uid;
     }
 
+    private function cleanPath($path)
+    {
+        $path = str_replace(['/', '\\', '//', '\\\\'], DIRECTORY_SEPARATOR, $path);
+        if (in_array(substr($path, 0, 1), ['/', '\\'])) {
+            $path = DIRECTORY_SEPARATOR . substr($path, 1);
+        }
+        return $path;
+    }
 }

@@ -43,6 +43,14 @@ class JsonRenderer
         $this->errors = $errors;
     }
 
+    public function inheritLinks()
+    {
+        if (count($this->data) === 1 && isset($this->data[0]->links)) {
+            $this->links = $this->data[0]->links;
+            unset($this->data[0]->links);
+        }
+    }
+
     public function setLinks(array $links)
     {
         $this->links = $links;
