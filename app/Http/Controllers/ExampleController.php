@@ -10,7 +10,12 @@ class ExampleController extends BaseController
 {
     public function index(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        $jsonResponse = new JsonRenderer([]);
+        $jsonResponse = new JsonRenderer([
+
+            'content-types', // foreach content-type show number of items, drafts, etc.
+            'filesystem'
+
+        ]);
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath()
         ]);
