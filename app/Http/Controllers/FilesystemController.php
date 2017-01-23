@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Definitions\Directory;
 use App\Definitions\File;
 use App\Definitions\JsonDefinition;
+use App\Definitions\Path;
 use App\JsonRenderer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,34 +36,21 @@ class FilesystemController extends BaseController
         return $jsonResponse->render($response);
     }
 
-    public function directory(ServerRequestInterface $request, ResponseInterface $response, array $args){
+    public function path(ServerRequestInterface $request, ResponseInterface $response, array $args){
 
-        return 'yo';
+        $this->bootProject(new NullOutput());
+        $path = (isset($args['id']) ? base64_decode($args['id']) : "");
 
-        //$this->bootProject(new NullOutput());
+        if (realpath($this->project->sourceDirectory . DIRECTORY_SEPARATOR . $path) === false){
+                return $response->withStatus(404);
+        }
 
-        //$path = "";
-
-        //if (isset($args['id'])) {
-        //    $path = base64_decode($args['id']);
-        //}
-
-        //$realPath = realpath($this->project->sourceDirectory . DIRECTORY_SEPARATOR . $path);
-
-        //if (!$realPath){
-        //    return $response->withStatus(404);
-        //}
-
-        //$directory = new Directory($path, $this->container);
-        //$directory = $directory
-        //    ->withFilesRelationship()
-        //    ->withDirectoriesRelationship();
-
-        //$jsonResponse = new JsonRenderer([$directory->toJsonResponse()]);
-        //$jsonResponse->setLinks([
-        //    'self' => (string)$request->getUri()->getPath(),
-        //]);
-        //return $jsonResponse->render($response);
+        $path = new Path($path, $this->container);
+        $path = $path->withPathRelationship()
+            ->withProjectFileRelationship();
+        $jsonResponse = new JsonRenderer([$path->toJsonResponse()]);
+        $jsonResponse->inheritLinks();
+        return $jsonResponse->render($response);
     }
 
     public function view(ServerRequestInterface $request, ResponseInterface $response, array $args)

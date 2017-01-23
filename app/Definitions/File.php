@@ -53,7 +53,7 @@ class File extends JsonDefinition
     public function withDirectoryRelationship()
     {
         $clone = clone($this);
-        //$clone->setRelationship(new Directory($this->attributes['path'], $this->container));
+        $clone->setRelationship(new Path($this->attributes['path'], $this->container));
         return $clone;
     }
 

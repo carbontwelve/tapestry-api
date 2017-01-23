@@ -32,3 +32,5 @@ $app->get('/project/file/{id}', 'App\Http\Controllers\FilesystemController:file'
 $app->get('/filesystem/directory[/{id}]', 'App\Http\Controllers\FilesystemController:directory')
     ->setName('filesystem.directory');
 
+$app->get('/filesystem[/{id}]', 'App\Http\Controllers\FilesystemController:path')
+    ->setName('filesystem.path');
