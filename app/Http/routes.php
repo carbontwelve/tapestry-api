@@ -17,6 +17,16 @@ $app->get('/', 'App\Http\Controllers\ExampleController:index')
     ->setName('home');
 
 //
+// Handshake and Authentication Routes
+//
+
+$app->get('/handshake', 'App\Http\Controllers\AuthenticationController:handshake')
+    ->setName('handshake');
+
+$app->post('/authenticate', 'App\Http\Controllers\AuthenticationController:authenticate')
+    ->setName('authenticate');
+
+//
 // Project Routes
 //
 
