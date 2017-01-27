@@ -27,6 +27,12 @@ $app->post('/authenticate', 'App\Http\Controllers\AuthenticationController:authe
     ->setName('authenticate');
 
 //
+// Projects
+//
+
+
+
+//
 // Project Routes
 //
 

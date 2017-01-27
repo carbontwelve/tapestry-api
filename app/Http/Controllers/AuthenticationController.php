@@ -8,6 +8,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
 use Tapestry\Entities\Configuration;
 use Tapestry\Tapestry;
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 class AuthenticationController extends BaseController
 {
@@ -18,6 +20,7 @@ class AuthenticationController extends BaseController
 
         $jsonResponse = new JsonRenderer([
             'tapestryVersion' => Tapestry::VERSION,
+            'projects' => 1,
             'siteName' => $config->get('site.title', 'unnamed')
         ]);
         $jsonResponse->setLinks([
@@ -41,8 +44,23 @@ class AuthenticationController extends BaseController
             return $response->withStatus(401);
         }
 
+        //
+        // @todo sign method needs a configured key
+        // @todo token id needs to be cached so that a user may revoke it
+        // @todo is one hour too short for a jwt? should it not be a longer time?
+        //
+
+        $signer = new Sha256();
+        $token = (new Builder())->setIssuer('http://127.0.0.1:8080')
+                                ->setId('4f1g23a12aa', true)
+                                ->setIssuedAt(time())
+                                ->setExpiration(time() + 3600)
+                                ->set('uid', 1)
+                                ->sign($signer, 'testing')
+                                ->getToken();
+
         $jsonResponse = new JsonRenderer([
-            'jwt' => 'hello world!'
+            'jwt' => (string) $token
         ]);
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath()
