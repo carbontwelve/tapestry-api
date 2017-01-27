@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\JsonRenderer;
+use App\Resources\ProjectResource;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
@@ -12,11 +13,25 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 
 class AuthenticationController extends BaseController
 {
+    /**
+     * @var ProjectResource
+     */
+    private $projectResource;
+
+    /**
+     * ProjectController constructor.
+     * @param ProjectResource $projectResource
+     */
+    public function __construct(ProjectResource $projectResource)
+    {
+        $this->projectResource = $projectResource;
+    }
+
     public function handshake(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
         $jsonResponse = new JsonRenderer([
             'tapestryVersion' => Tapestry::VERSION,
-            'projects' => 1
+            'projects' => $this->projectResource->count()
         ]);
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath()
