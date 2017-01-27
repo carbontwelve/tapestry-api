@@ -30,7 +30,8 @@ $app->post('/authenticate', 'App\Http\Controllers\AuthenticationController:authe
 // Projects
 //
 
-
+$app->get('/projects', 'App\Http\Controllers\ProjectController:index')
+    ->setName('project.index');
 
 //
 // Project Routes
@@ -55,7 +56,7 @@ $app->get('/project/file/{id}', 'App\Http\Controllers\FilesystemController:file'
     ->setName('project.file');
 
 //
-// File System
+// Project File System Routes
 //
 
 $app->get('/filesystem/directory[/{id}]', 'App\Http\Controllers\FilesystemController:directory')

@@ -6,7 +6,6 @@ use App\JsonRenderer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
-use Tapestry\Entities\Configuration;
 use Tapestry\Tapestry;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
@@ -15,13 +14,9 @@ class AuthenticationController extends BaseController
 {
     public function handshake(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        /** @var Configuration $config */
-        $config = $this->tapestry[Configuration::class];
-
         $jsonResponse = new JsonRenderer([
             'tapestryVersion' => Tapestry::VERSION,
-            'projects' => 1,
-            'siteName' => $config->get('site.title', 'unnamed')
+            'projects' => 1
         ]);
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\TapestryCoreFactory;
 use Interop\Container\ContainerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tapestry\Entities\Project;
@@ -11,15 +12,11 @@ use Tapestry\Modules\ContentTypes\LoadContentTypes;
 use Tapestry\Modules\Generators\LoadContentGenerators;
 use Tapestry\Modules\Kernel\BootKernel;
 use Tapestry\Modules\Renderers\LoadContentRenderers;
-use Tapestry\Tapestry;
 
 class BaseController
 {
     /** @var null|ContainerInterface|\Slim\Container */
     protected $container;
-
-    /** @var Tapestry */
-    protected $tapestry;
 
     /** @var array  */
     protected $steps = [
@@ -38,8 +35,17 @@ class BaseController
 
     protected function bootProject(OutputInterface $output)
     {
-        $this->project = $this->tapestry->getContainer()->get(Project::class);
-        $generator = new Generator($this->steps, $this->tapestry);
+        /** @var TapestryCoreFactory $tapestryFactory */
+        $tapestryFactory = $this->container->get(TapestryCoreFactory::class);
+        /** @var \Tapestry\Tapestry $tapestry */
+        $tapestry = $tapestryFactory->build([
+            '--env' => 'local',
+            '--site-dir' => APP_BASE . '/test-site',
+            '--dist-dir' => APP_BASE . '/storage/dist-local'
+        ]);
+
+        $this->project = $tapestry->getContainer()->get(Project::class);
+        $generator = new Generator($this->steps, $tapestry);
         $generator->generate($this->project, $output);
         $this->container[Project::class] = $this->project;
     }
@@ -50,7 +56,6 @@ class BaseController
     public function setContainer(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->tapestry = $this->container->get(Tapestry::class);
     }
 
     /**

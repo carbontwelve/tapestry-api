@@ -1,6 +1,6 @@
 <?php
 
-namespace Site;
+namespace ApiTestSite;
 
 use Tapestry\Tapestry;
 use Tapestry\Modules\Kernel\KernelInterface;
