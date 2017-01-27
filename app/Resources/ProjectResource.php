@@ -11,9 +11,33 @@ class ProjectResource extends AbstractResource
     public function get($id = null)
     {
         if (is_null($id)) {
-            return $this->entityManager->getRepository(Project::class)->findAll();
+            /** @var Project[]|null $records */
+            if ($records = $this->entityManager->getRepository(Project::class)->findAll()) {
+                return array_map(
+                    function ($record) {
+                        /** @var Project $record */
+                        return $record->getArrayCopy();
+                    },
+                    $records
+                );
+            }
+            return null;
         }
-        return $this->entityManager->getRepository(Project::class)->findOneBy(['id' => $id]);
+        /** @var Project|null $record */
+        if ($record = $this->entityManager->getRepository(Project::class)->findOneBy(['id' => $id])) {
+            return $record->getArrayCopy();
+        }
+        return null;
+    }
+
+    public function save(Project $project) {
+        $this->entityManager->persist($project);
+        $this->entityManager->flush();
+    }
+
+    public function delete(Project $project) {
+        $this->entityManager->remove($project);
+        $this->entityManager->flush();
     }
 
     public function count()

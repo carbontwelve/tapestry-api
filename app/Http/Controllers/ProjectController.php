@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entity\Project;
 use App\JsonRenderer;
 use App\Resources\ProjectResource;
 use Slim\Http\Request;
@@ -34,5 +35,13 @@ class ProjectController extends BaseController
             'self' => (string)$request->getUri()->getPath()
         ]);
         return $jsonResponse->render($response);
+    }
+
+    public function create(Request $request, Response $response, array $args)
+    {
+        $project = new Project();
+        $project->setName($request->getParsedBodyParam('name', null));
+        $project->setPath(APP_BASE . '/storage/projects/' . str_slug($project->getName()));
+        $this->projectResource->save($project);
     }
 }

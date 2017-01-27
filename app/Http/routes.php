@@ -33,6 +33,9 @@ $app->post('/authenticate', 'App\Http\Controllers\AuthenticationController:authe
 $app->get('/projects', 'App\Http\Controllers\ProjectController:index')
     ->setName('project.index');
 
+$app->post('/projects', 'App\Http\Controllers\ProjectController:create')
+    ->setName('project.create');
+
 //
 // Project Routes
 //
