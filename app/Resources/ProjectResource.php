@@ -30,6 +30,14 @@ class ProjectResource extends AbstractResource
         return null;
     }
 
+    public function findByName($name) {
+        /** @var Project|null $record */
+        if ($record = $this->entityManager->getRepository(Project::class)->findOneBy(['name' => $name])) {
+            return $record->getArrayCopy();
+        }
+        return null;
+    }
+
     public function save(Project $project) {
         $this->entityManager->persist($project);
         $this->entityManager->flush();

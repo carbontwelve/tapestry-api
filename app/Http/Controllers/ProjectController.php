@@ -43,5 +43,24 @@ class ProjectController extends BaseController
         $project->setName($request->getParsedBodyParam('name', null));
         $project->setPath(APP_BASE . '/storage/projects/' . str_slug($project->getName()));
         $this->projectResource->save($project);
+
+        $jsonResponse = new JsonRenderer([]);
+        $jsonResponse->setLinks([
+            'self' => (string)$request->getUri()->getPath()
+        ]);
+        return $jsonResponse->render($response);
+    }
+
+    public function check(Request $request, Response $response, array $args)
+    {
+        $project = $this->projectResource->findByName($request->getParsedBodyParam('name', null));
+
+        $jsonResponse = new JsonRenderer([
+            'exists' => !is_null($project)
+        ]);
+        $jsonResponse->setLinks([
+            'self' => (string)$request->getUri()->getPath()
+        ]);
+        return $jsonResponse->render($response);
     }
 }
