@@ -10,6 +10,8 @@ class ProjectResource extends AbstractResource
 {
     public function get($id = null)
     {
+        sleep(2);
+
         if (is_null($id)) {
             /** @var Project[]|null $records */
             if ($records = $this->entityManager->getRepository(Project::class)->findAll()) {
