@@ -7,15 +7,36 @@ use App\Definitions\ContentType;
 use App\Definitions\JsonDefinition;
 use App\Definitions\Taxonomy;
 use App\JsonRenderer;
+use App\Resources\ProjectResource;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Http\Request;
+use Slim\Http\Response;
 use Symfony\Component\Console\Output\NullOutput;
 
 class ContentTypeController extends BaseController
 {
-    public function index(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    /**
+     * @var ProjectResource
+     */
+    private $projectResource;
+
+    /**
+     * ProjectController constructor.
+     * @param ProjectResource $projectResource
+     */
+    public function __construct(ProjectResource $projectResource)
     {
-        $this->bootProject(new NullOutput());
+        $this->projectResource = $projectResource;
+    }
+
+    public function index(Request $request, Response $response, array $args)
+    {
+        if (! $project = $this->projectResource->get($args['project'])) {
+            return $this->abort($response, 'Project Not Found');
+        }
+
+        $this->bootProject(new NullOutput(), $project);
 
         /** @var \Tapestry\Modules\ContentTypes\ContentTypeFactory $model */
         $model = $this->project['content_types'];
@@ -26,7 +47,7 @@ class ContentTypeController extends BaseController
             if (!$contentType->isEnabled()) {
                 continue;
             }
-            $contentType = new ContentType($contentType, $this->container);
+            $contentType = new ContentType($contentType, $project, $this->container);
             array_push($contentTypes, $contentType->toJsonResponse());
         }
 
@@ -37,9 +58,13 @@ class ContentTypeController extends BaseController
         return $jsonResponse->render($response);
     }
 
-    public function view(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    public function view(ServerRequestInterface $request, Response $response, array $args)
     {
-        $this->bootProject(new NullOutput());
+        if (! $project = $this->projectResource->get($args['project'])) {
+            return $this->abort($response, 'Project Not Found');
+        }
+
+        $this->bootProject(new NullOutput(), $project);
 
         /** @var \Tapestry\Entities\ContentType|null $model */
         if (! $model = $this->project['content_types.' . $args['contentType']]) {
@@ -47,7 +72,7 @@ class ContentTypeController extends BaseController
         }
 
         /** @var ContentType $contentType */
-        $contentType = new ContentType($model, $this->container);
+        $contentType = new ContentType($model, $project, $this->container);
         $contentType = $contentType->apply(function(JsonDefinition $definition){
             $definition->unsetLink('self');
             return $definition;

@@ -20,4 +20,6 @@ $config = \Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration(
 
 $em = \Doctrine\ORM\EntityManager::create($settings['connection'], $config);
 
+\Doctrine\DBAL\Types\Type::addType('uuid', 'Ramsey\Uuid\Doctrine\UuidType');
+
 return ConsoleRunner::createHelperSet($em);

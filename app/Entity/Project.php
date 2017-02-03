@@ -11,9 +11,12 @@ use Doctrine\ORM\Mapping as ORM;
 class Project
 {
     /**
+     * @var \Ramsey\Uuid\Uuid
+     *
      * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="uuid")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator(class="Ramsey\Uuid\Doctrine\UuidGenerator")
      */
     protected $id;
 

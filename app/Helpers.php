@@ -32,3 +32,23 @@ if (!function_exists('templatePath')) {
         return APP_BASE.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR.$name;
     }
 }
+
+if (!function_exists('getArrayCopy')) {
+
+    /**
+     * @param App\Entity\Project|App\Entity\Project[] $records
+     * @return array
+     */
+    function getArrayCopy($records) {
+        if (is_array($records)) {
+            return array_map(
+                function ($record) {
+                    /** @var App\Entity\Project $record */
+                    return $record->getArrayCopy();
+                },
+                $records
+            );
+        }
+        return $records->getArrayCopy();
+    }
+}

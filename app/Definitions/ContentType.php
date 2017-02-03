@@ -22,16 +22,22 @@ class ContentType extends JsonDefinition
     private $container;
 
     private $contentType;
+    /**
+     * @var \App\Entity\Project
+     */
+    private $project;
 
     /**
      * ContentType constructor.
      * @param TapestryContentType $contentType
+     * @param \App\Entity\Project $project
      * @param Container $container
      */
-    public function __construct(TapestryContentType $contentType, Container $container)
+    public function __construct(TapestryContentType $contentType, \App\Entity\Project $project, Container $container)
     {
         $this->container = $container;
         $this->contentType = $contentType;
+        $this->project = $project;
         $this->hydrate($contentType);
     }
 
@@ -48,6 +54,7 @@ class ContentType extends JsonDefinition
         $this->setAttribute('fileCount', count($contentType->getFileList()));
 
         $this->setLink('self', $this->container->get('router')->pathFor('content-type.view', [
+            'project' => $this->project->getId(),
             'contentType' => $contentType->getName()
         ]));
     }
@@ -58,6 +65,7 @@ class ContentType extends JsonDefinition
         foreach($this->contentType->getTaxonomies() as $taxonomy) {
             $tmpTaxonomy = new Taxonomy($taxonomy, $this->container);
             $tmpTaxonomy->setLink('related', $this->container->get('router')->pathFor('content-type.taxonomy', [
+                'project' => $this->project->getId(),
                 'contentType' => $this->contentType->getName(),
                 'taxonomy' => $taxonomy->getName()
             ]));

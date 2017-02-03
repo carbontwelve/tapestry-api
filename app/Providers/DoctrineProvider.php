@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\Factories\TapestryCoreFactory;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use Interop\Container\ContainerInterface;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Ramsey\Uuid\Doctrine\UuidType;
 
 class DoctrineProvider implements ServiceProviderInterface
 {
@@ -31,6 +33,7 @@ class DoctrineProvider implements ServiceProviderInterface
             $settings['doctrine']['meta']['cache'],
             false
         );
+        Type::addType('uuid', UuidType::class);
         $pimple[EntityManager::class] = EntityManager::create($settings['doctrine']['connection'], $config);
     }
 }

@@ -52,7 +52,7 @@ class ControllerProvider implements ServiceProviderInterface
         };
 
         $this->controllers['App\Http\Controllers\ContentTypeController'] = function(\Slim\Container $c) {
-            $controller = new ContentTypeController();
+            $controller = new ContentTypeController(new ProjectResource($c->get(EntityManager::class)));
             $controller->setContainer($c);
             return $controller;
         };

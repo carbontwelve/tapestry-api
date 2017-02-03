@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Entity\Project;
+use App\Factories\TapestryCoreFactory;
 use App\JsonRenderer;
 use App\Resources\ProjectResource;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Tapestry\Console\Application;
+use Tapestry\Console\DefaultInputDefinition;
 use Tapestry\Tapestry;
 
 class ProjectController extends BaseController
@@ -29,7 +34,7 @@ class ProjectController extends BaseController
     {
         $jsonResponse = new JsonRenderer([
             'tapestryVersion' => Tapestry::VERSION,
-            'projects' => $this->projectResource->get()
+            'projects' => getArrayCopy($this->projectResource->get())
         ]);
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath()
@@ -44,7 +49,24 @@ class ProjectController extends BaseController
         $project->setPath(APP_BASE . '/storage/projects/' . str_slug($project->getName()));
         $this->projectResource->save($project);
 
-        $jsonResponse = new JsonRenderer([]);
+        // @todo if the directory exists then return error or increment the path? e.g. test => test-1...
+        mkdir($project->getpath());
+
+        /** @var TapestryCoreFactory $tf */
+        $tf = $this->container->get(TapestryCoreFactory::class);
+        $tapestry = $tf->build([
+            '--site-dir' => $project->getpath()
+        ]);
+
+        /** @var Application $cli */
+        $cli = $tapestry[Application::class];
+        $cli->setAutoExit(false);
+        $cli->run(new ArrayInput([
+            'command' => 'init',
+            '--site-dir' => $project->getpath()
+        ], new DefaultInputDefinition), new NullOutput);
+
+        $jsonResponse = new JsonRenderer($project->getArrayCopy());
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath()
         ]);

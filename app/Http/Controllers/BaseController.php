@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Factories\TapestryCoreFactory;
+use App\JsonRenderer;
 use Interop\Container\ContainerInterface;
+use Slim\Http\Response;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tapestry\Entities\Project;
 use Tapestry\Generator;
@@ -33,14 +35,15 @@ class BaseController
      */
     protected $project;
 
-    protected function bootProject(OutputInterface $output)
+    protected function bootProject(OutputInterface $output, \App\Entity\Project $project)
     {
         /** @var TapestryCoreFactory $tapestryFactory */
         $tapestryFactory = $this->container->get(TapestryCoreFactory::class);
         /** @var \Tapestry\Tapestry $tapestry */
         $tapestry = $tapestryFactory->build([
             '--env' => 'local',
-            '--site-dir' => APP_BASE . '/test-site',
+            //'--site-dir' => APP_BASE . '/test-site',
+            '--site-dir' => $project->getPath(),
             '--dist-dir' => APP_BASE . '/storage/dist-local'
         ]);
 
@@ -64,5 +67,19 @@ class BaseController
     public function getContainer()
     {
         return $this->container;
+    }
+
+    /**
+     * @param Response $response
+     * @param string $message
+     * @return \Psr\Http\Message\ResponseInterface|Response
+     */
+    protected function abort(Response $response, $message)
+    {
+        $jsonResponse = new JsonRenderer([
+            'error' => true,
+            'message' => $message
+        ]);
+        return $jsonResponse->render($response);
     }
 }
