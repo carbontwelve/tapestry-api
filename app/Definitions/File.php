@@ -19,12 +19,19 @@ class File extends JsonDefinition
     private $file;
 
     /**
+     * @var \App\Entity\Project
+     */
+    private $project;
+
+    /**
      * ContentType constructor.
      * @param ProjectFileInterface|\Tapestry\Entities\File $file
+     * @param \App\Entity\Project $project
      * @param Container $container
      */
-    public function __construct(ProjectFileInterface $file, Container $container)
+    public function __construct(ProjectFileInterface $file, \App\Entity\Project $project, Container $container)
     {
+        $this->project = $project;
         $this->container = $container;
         $this->hydrate($file);
     }
@@ -42,12 +49,24 @@ class File extends JsonDefinition
         $this->setAttribute('path', $file->getPath());
         $this->setAttribute('contentType', $file->getData('contentType', 'default'));
         $this->setLink('self', $this->container->get('router')->pathFor('project.file', [
-            'id' => $this->getId()
+            'id' => $this->getId(),
+            'project' => $this->project->getId()
         ]));
 
+        //
+        // Merge Frontmatter
+        //
         $frontMatter = new FrontMatter($this->file->getFileContent());
+        $frontMatterData = $frontMatter->getData();
+        $date = $this->file->getData('date', $this->file->getLastModified());
+        if ($date instanceof \DateTime) {
+            $date = $date->getTimestamp();
+        }
+        $frontMatterData['date'] = $date;
+        $frontMatterData['title'] = $this->file->getData('title', $frontMatterData['title']);
+
         $this->setAttribute('fileContent', $frontMatter->getContent());
-        $this->setAttribute('frontMatter', $frontMatter->getData());
+        $this->setAttribute('frontMatter', $frontMatterData);
     }
 
     public function withDirectoryRelationship()

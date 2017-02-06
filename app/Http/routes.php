@@ -58,7 +58,7 @@ $app->get('/project/{project}/content-types/{contentType}/taxonomy/{taxonomy}', 
 $app->get('/project/{project}/content-types/{contentType}/taxonomy/{taxonomy}/{classification}', 'App\Http\Controllers\ContentTypeController:classification')
     ->setName('content-type.taxonomy.classification');
 
-$app->get('/project/file/{id}', 'App\Http\Controllers\FilesystemController:file')
+$app->get('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemController:file')
     ->setName('project.file');
 
 //

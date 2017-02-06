@@ -2,26 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Definitions\Directory;
 use App\Definitions\File;
 use App\Definitions\JsonDefinition;
 use App\Definitions\Path;
 use App\JsonRenderer;
+use App\Resources\ProjectResource;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Slim\Http\Response;
 use Symfony\Component\Console\Output\NullOutput;
 
 class FilesystemController extends BaseController
 {
-    public function file(ServerRequestInterface $request, ResponseInterface $response, array $args){
-        $this->bootProject(new NullOutput());
+    /**
+     * @var ProjectResource
+     */
+    private $projectResource;
+
+    /**
+     * ProjectController constructor.
+     * @param ProjectResource $projectResource
+     */
+    public function __construct(ProjectResource $projectResource)
+    {
+        $this->projectResource = $projectResource;
+    }
+
+    public function file(ServerRequestInterface $request, Response $response, array $args){
+
+        if (! $project = $this->projectResource->get($args['project'])) {
+            return $this->abort($response, 'Project Not Found');
+        }
+
+        $this->bootProject(new NullOutput(), $project);
 
         /** @var \Tapestry\Entities\File $tapestryFile */
         if (! $tapestryFile = $this->project['files.' . $args['id']]) {
             return $response->withStatus(404);
         }
 
-        $file = new File($tapestryFile, $this->container);
+        /** @var File $file */
+        $file = new File($tapestryFile, $project, $this->container);
         $file = $file->withDirectoryRelationship();
 
         $file = $file->apply(function(JsonDefinition $definition){
@@ -36,9 +57,14 @@ class FilesystemController extends BaseController
         return $jsonResponse->render($response);
     }
 
-    public function path(ServerRequestInterface $request, ResponseInterface $response, array $args){
+    public function path(ServerRequestInterface $request, Response $response, array $args){
 
-        $this->bootProject(new NullOutput());
+        if (! $project = $this->projectResource->get($args['project'])) {
+            return $this->abort($response, 'Project Not Found');
+        }
+
+        $this->bootProject(new NullOutput(), $project);
+
         $path = (isset($args['id']) ? base64_decode($args['id']) : "");
 
         if (realpath($this->project->sourceDirectory . DIRECTORY_SEPARATOR . $path) === false){

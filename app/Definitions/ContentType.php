@@ -96,8 +96,7 @@ class ContentType extends JsonDefinition
                 continue;
             }
             /** @var ProjectFileInterface $file */
-
-            $tmpFile = new File($file, $this->container);
+            $tmpFile = new File($file, $this->project, $this->container);
 
             if (! is_null($closure) && $closure instanceof \Closure){
                 $tmpFile = $closure($tmpFile);
@@ -105,7 +104,6 @@ class ContentType extends JsonDefinition
                     throw new \Exception('The closure passed to withFilesRelationship must return an instance of File.');
                 }
             }
-
 
             $clone->setRelationship($tmpFile);
         }

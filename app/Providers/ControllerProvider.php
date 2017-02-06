@@ -58,7 +58,7 @@ class ControllerProvider implements ServiceProviderInterface
         };
 
         $this->controllers['App\Http\Controllers\FilesystemController'] = function(\Slim\Container $c) {
-            $controller = new FilesystemController();
+            $controller = new FilesystemController(new ProjectResource($c->get(EntityManager::class)));
             $controller->setContainer($c);
             return $controller;
         };
