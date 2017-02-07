@@ -84,7 +84,7 @@ class ContentTypeController extends BaseController
             })
             ->withFilesRelationship();
 
-        $jsonResponse = new JsonRenderer([$contentType->toJsonResponse()]);
+        $jsonResponse = new JsonRenderer(['data' => $contentType->toJsonResponse()]);
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath()
         ]);
