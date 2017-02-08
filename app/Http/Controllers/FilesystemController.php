@@ -50,7 +50,7 @@ class FilesystemController extends BaseController
             return $definition;
         });
 
-        $jsonResponse = new JsonRenderer([$file->toJsonResponse()]);
+        $jsonResponse = new JsonRenderer(['data' => $file->toJsonResponse()]);
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath(),
         ]);
