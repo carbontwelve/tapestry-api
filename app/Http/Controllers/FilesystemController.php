@@ -79,6 +79,7 @@ class FilesystemController extends BaseController
         $jsonResponse->setLinks([
             'self' => (string)$request->getUri()->getPath(),
         ]);
+        $jsonResponse->inheritLinks();
         return $jsonResponse->render($response);
     }
 

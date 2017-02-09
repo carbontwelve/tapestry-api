@@ -53,6 +53,10 @@ class File extends JsonDefinition
             'id' => $this->getId(),
             'project' => $this->project->getId()
         ]));
+        $this->setLink('contentType', $this->container->get('router')->pathFor('content-type.view', [
+            'contentType' => $this->getAttribute('contentType'),
+            'project' => $this->project->getId()
+        ]));
 
         //
         // Merge Frontmatter

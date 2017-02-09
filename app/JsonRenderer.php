@@ -49,9 +49,19 @@ class JsonRenderer
 
     public function inheritLinks()
     {
-        if (count($this->data) === 1 && isset($this->data[0]->links)) {
-            $this->links = $this->data[0]->links;
-            unset($this->data[0]->links);
+        if (is_array($this->data)) {
+            if (count($this->data) === 1 && isset($this->data[0]->links)) {
+                $this->links = array_merge($this->links, $this->data[0]->links);
+                unset($this->data[0]->links);
+            }
+            return;
+        }
+
+        if (is_object($this->data)) {
+            if (isset($this->data->links)) {
+                $this->links = array_merge($this->links, $this->data->links);
+                unset($this->data->links);
+            }
         }
     }
 
