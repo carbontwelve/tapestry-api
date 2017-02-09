@@ -31,6 +31,11 @@ class JsonDefinition
         $this->updateRelationships();
     }
 
+    public function getAttribute($key)
+    {
+        return $this->attributes[$key];
+    }
+
     public function setLink($name, $url)
     {
         $this->links[$name] = $url;

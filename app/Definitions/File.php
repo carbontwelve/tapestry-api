@@ -3,6 +3,7 @@
 namespace App\Definitions;
 
 use Slim\Container;
+use Symfony\Component\Yaml\Yaml;
 use Tapestry\Entities\ProjectFileInterface;
 use Tapestry\Modules\Content\FrontMatter;
 
@@ -65,8 +66,28 @@ class File extends JsonDefinition
         $frontMatterData['date'] = $date;
         $frontMatterData['title'] = $this->file->getData('title', $frontMatterData['title']);
 
+        $this->setAttribute('last_modified', $this->file->getLastModified());
         $this->setAttribute('fileContent', $frontMatter->getContent());
         $this->setAttribute('frontMatter', $frontMatterData);
+    }
+
+    public function merge($json)
+    {
+        $clone = clone($this);
+        $clone->setAttribute('fileContent', $json['data']['attributes']['fileContent']);
+        $clone->setAttribute('frontMatter', array_merge($this->attributes['frontMatter'], $json['data']['attributes']['frontMatter']));
+        return $clone;
+    }
+
+    public function save()
+    {
+        $fileContent =
+            "---\n" .
+            Yaml::dump($this->getAttribute('frontMatter')) .
+            "---\n\n" .
+            $this->getAttribute('fileContent');
+
+        return file_put_contents($this->file->getFileInfo()->getPathname(), $fileContent);
     }
 
     public function withDirectoryRelationship()

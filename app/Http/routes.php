@@ -58,8 +58,11 @@ $app->get('/project/{project}/content-types/{contentType}/taxonomy/{taxonomy}', 
 $app->get('/project/{project}/content-types/{contentType}/taxonomy/{taxonomy}/{classification}', 'App\Http\Controllers\ContentTypeController:classification')
     ->setName('content-type.taxonomy.classification');
 
-$app->get('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemController:file')
+$app->get('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemController:view')
     ->setName('project.file');
+
+$app->put('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemController:update')
+    ->setName('project.file.update');
 
 //
 // Project File System Routes
