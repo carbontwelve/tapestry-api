@@ -7,12 +7,9 @@ use App\Definitions\JsonDefinition;
 use App\Definitions\Path;
 use App\JsonRenderer;
 use App\Resources\ProjectResource;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Yaml\Yaml;
 
 class FilesystemController extends BaseController
 {
@@ -32,7 +29,6 @@ class FilesystemController extends BaseController
 
     public function path(Request $request, Response $response, array $args)
     {
-
         if (! $project = $this->projectResource->get($args['project'])) {
             return $this->abort($response, 'Project Not Found');
         }

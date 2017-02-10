@@ -7,6 +7,7 @@ use App\JsonRenderer;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Response;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tapestry\Entities\Configuration;
 use Tapestry\Entities\Project;
 use Tapestry\Generator;
 use Tapestry\Modules\Content\LoadSourceFiles;
@@ -46,6 +47,11 @@ class BaseController
             '--site-dir' => $project->getPath(),
             '--dist-dir' => APP_BASE . '/storage/dist-local'
         ]);
+
+        // I have set this here so that the API will return draft posts (otherwise Tapestry filters them out)
+        // however this will need factoring out for project generation.
+        $configuration = $tapestry->getContainer()->get(Configuration::class);
+        $configuration->set('publish_drafts', true);
 
         $this->project = $tapestry->getContainer()->get(Project::class);
         $generator = new Generator($this->steps, $tapestry);

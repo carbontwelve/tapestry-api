@@ -46,6 +46,7 @@ class File extends JsonDefinition
         $this->type = 'file';
         $this->file = $file;
 
+        $this->setAttribute('name', $file->getFilename());
         $this->setAttribute('ext', $file->getExt());
         $this->setAttribute('path', $file->getPath());
         $this->setAttribute('contentType', $file->getData('contentType', 'default'));
@@ -63,13 +64,14 @@ class File extends JsonDefinition
         //
         $frontMatter = new FrontMatter($this->file->getFileContent());
         $frontMatterData = $frontMatter->getData();
+        $frontMatterData['title'] = $this->file->getData('title', $frontMatterData['title']);
+
         $date = $this->file->getData('date', $this->file->getLastModified());
         if ($date instanceof \DateTime) {
             $date = $date->getTimestamp();
         }
-        $frontMatterData['date'] = $date;
-        $frontMatterData['title'] = $this->file->getData('title', $frontMatterData['title']);
-
+        //$frontMatterData['date'] = $date;
+        $this->setAttribute('date', $date);
         $this->setAttribute('last_modified', $this->file->getLastModified());
         $this->setAttribute('fileContent', $frontMatter->getContent());
         $this->setAttribute('frontMatter', $frontMatterData);
@@ -85,9 +87,12 @@ class File extends JsonDefinition
 
     public function save()
     {
+        $frontMatter = array_filter($this->getAttribute('frontMatter'), function($value) {
+            return ! is_null($value);
+        });
         $fileContent =
             "---\n" .
-            Yaml::dump($this->getAttribute('frontMatter')) .
+            Yaml::dump($frontMatter) .
             "---\n\n" .
             $this->getAttribute('fileContent');
 
