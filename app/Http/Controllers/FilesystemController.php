@@ -27,6 +27,38 @@ class FilesystemController extends BaseController
         $this->projectResource = $projectResource;
     }
 
+    /**
+     * @todo add pagination, for when we have a lot of files to list...
+     * @param Request $request
+     * @param Response $response
+     * @param array $args
+     * @return \Psr\Http\Message\ResponseInterface|Response
+     */
+    public function all(Request $request, Response $response, array $args)
+    {
+        if (! $project = $this->projectResource->get($args['project'])) {
+            return $this->abort($response, 'Project Not Found');
+        }
+
+        $this->bootProject(new NullOutput(), $project);
+
+        $files = [];
+
+        /** @var \Tapestry\Entities\File $tapestryFile */
+        foreach ($this->project['files'] as $tapestryFile) {
+            /** @var File $file */
+            $file = new File($tapestryFile, $project, $this->container);
+            array_push($files, $file->toJsonResponse());
+        }
+
+        $jsonResponse = new JsonRenderer($files);
+        $jsonResponse->setLinks([
+            'self' => (string)$request->getUri()->getPath(),
+        ]);
+        $jsonResponse->inheritLinks();
+        return $jsonResponse->render($response);
+    }
+
     public function path(Request $request, Response $response, array $args)
     {
         if (! $project = $this->projectResource->get($args['project'])) {

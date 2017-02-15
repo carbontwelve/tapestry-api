@@ -61,6 +61,9 @@ $app->get('/project/{project}/content-types/{contentType}/taxonomy/{taxonomy}/{c
 $app->get('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemController:view')
     ->setName('project.file');
 
+$app->get('/project/{project}/files', 'App\Http\Controllers\FilesystemController:all')
+    ->setName('project.files');
+
 $app->put('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemController:update')
     ->setName('project.file.update');
 
