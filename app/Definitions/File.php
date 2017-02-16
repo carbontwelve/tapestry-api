@@ -80,8 +80,8 @@ class File extends JsonDefinition
     public function merge($json)
     {
         $clone = clone($this);
-        $clone->setAttribute('fileContent', $json['data']['attributes']['fileContent']);
-        $clone->setAttribute('frontMatter', array_merge($this->attributes['frontMatter'], $json['data']['attributes']['frontMatter']));
+        $clone->setAttribute('fileContent', $json['attributes']['fileContent']);
+        $clone->setAttribute('frontMatter', array_merge($this->attributes['frontMatter'], $json['attributes']['frontMatter']));
         return $clone;
     }
 
