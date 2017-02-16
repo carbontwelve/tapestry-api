@@ -16,8 +16,8 @@ chdir(getcwd().DIRECTORY_SEPARATOR.'public');
 
 function logAccess($status = 200)
 {
-    file_put_contents('php://stdout', sprintf("[%s] %s:%s [%s]: %s\n",
-        date('D M j H:i:s Y'), $_SERVER['REMOTE_ADDR'],
+    file_put_contents('php://stdout', sprintf("[%s] %s -> %s:%s [%s]: %s\n",
+        date('D M j H:i:s Y'), $_SERVER['REQUEST_METHOD'], $_SERVER['REMOTE_ADDR'],
         $_SERVER['REMOTE_PORT'], $status, $_SERVER['REQUEST_URI']));
 }
 
