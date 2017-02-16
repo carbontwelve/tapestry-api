@@ -40,6 +40,10 @@ if (!function_exists('getArrayCopy')) {
      * @return array
      */
     function getArrayCopy($records) {
+        if (is_null($records)) {
+            return [];
+        }
+
         if (is_array($records)) {
             return array_map(
                 function ($record) {
