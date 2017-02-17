@@ -78,14 +78,15 @@ class BaseController
     /**
      * @param Response $response
      * @param string $message
+     * @param int $code
      * @return \Psr\Http\Message\ResponseInterface|Response
      */
-    protected function abort(Response $response, $message)
+    protected function abort(Response $response, $message, $code = 412)
     {
         $jsonResponse = new JsonRenderer([
             'error' => true,
             'message' => $message
         ]);
-        return $jsonResponse->render($response);
+        return $jsonResponse->render($response, $code);
     }
 }
