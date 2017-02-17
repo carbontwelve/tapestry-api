@@ -64,7 +64,7 @@ class File extends JsonDefinition
         //
         $frontMatter = new FrontMatter($this->file->getFileContent());
         $frontMatterData = $frontMatter->getData();
-        $frontMatterData['title'] = $this->file->getData('title', $frontMatterData['title']);
+        $frontMatterData['title'] = $this->file->getData('title', ((isset($frontMatterData['title'])) ? $frontMatterData['title'] : $this->file->getFilename()));
 
         $date = $this->file->getData('date', $this->file->getLastModified());
         if ($date instanceof \DateTime) {
