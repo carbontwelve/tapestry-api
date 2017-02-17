@@ -64,6 +64,9 @@ $app->get('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemContro
 $app->get('/project/{project}/files', 'App\Http\Controllers\FilesystemController:all')
     ->setName('project.files');
 
+$app->post('/project/{project}/file', 'App\Http\Controllers\FilesystemController:create')
+    ->setName('project.file.create');
+
 $app->put('/project/{project}/file/{id}', 'App\Http\Controllers\FilesystemController:update')
     ->setName('project.file.update');
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Factories\TapestryCoreFactory;
 use App\JsonRenderer;
+use App\TapestryModules\MutateProjectFiles;
 use Interop\Container\ContainerInterface;
 use Slim\Http\Response;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,7 +29,8 @@ class BaseController
         LoadContentRenderers::class,
         LoadContentGenerators::class,
         LoadSourceFiles::class,
-        //Tapestry\Modules\ContentTypes\ParseContentTypes:class,
+        MutateProjectFiles::class
+        //\Tapestry\Modules\ContentTypes\ParseContentTypes::class
     ];
 
     /**

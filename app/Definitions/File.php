@@ -4,6 +4,7 @@ namespace App\Definitions;
 
 use Slim\Container;
 use Symfony\Component\Yaml\Yaml;
+use Tapestry\Entities\ContentType;
 use Tapestry\Entities\ProjectFileInterface;
 use Tapestry\Modules\Content\FrontMatter;
 
@@ -70,11 +71,13 @@ class File extends JsonDefinition
         if ($date instanceof \DateTime) {
             $date = $date->getTimestamp();
         }
-        //$frontMatterData['date'] = $date;
+
         $this->setAttribute('date', $date);
         $this->setAttribute('last_modified', $this->file->getLastModified());
         $this->setAttribute('fileContent', $frontMatter->getContent());
         $this->setAttribute('frontMatter', $frontMatterData);
+        $this->setAttribute('slug', $file->getData('slug'));
+        $this->setAttribute('permalink', ['raw' => $this->file->getData('permalink', $this->file->getData('content_type_permalink')), 'compiled' => $this->file->getCompiledPermalink()]);
     }
 
     public function merge($json)
